@@ -1,0 +1,20 @@
+Test Sock Server
+================
+
+Configuring and Building
+========================
+
+Currently no configuration is needed, as there is no installation script.
+To build the process:
+  g++ -o sockserver sockserver.cc
+
+
+Running and connecting to server
+================================
+
+To run the server invoke the executable name and give a port number:
+  ./sockserver 112233
+
+To connect to server, simply telnet to host (ie: localhost) on the port specified at server startup:
+  telnet localhost 112233
+
