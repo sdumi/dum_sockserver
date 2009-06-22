@@ -3,26 +3,8 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 
-//#include <signal.h>
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
-//#include <sys/types.h>
 #include <errno.h>
-//#include <unistd.h>
-//#include <netinet/in.h>
-//#include <limits.h>
-//#include <netdb.h>
 
-// #include <arpa/inet.h>
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <unistd.h>
-//#include <errno.h>
-// #include <string.h>
-//#include <sys/types.h>
-//#include <sys/socket.h>
-//#include <netinet/in.h>
 #include <netdb.h>
 
 #include <iostream>
@@ -74,14 +56,14 @@ int main(int argc, char* argv[])
   // ==> this is our highest  socket so far
   highsock = sock;
   // no connections yet
-  connectList.clear(); 
+  connectList.clear();
 
   // now finally we can enter:
-  /////////// MAIN LOOP //////////////	
+  /////////// MAIN LOOP //////////////
   while (1)
   {
     // need to recreate the list of sockets we want to listen to
-    // we'll send it to select method... which will return when one 
+    // we'll send it to select method... which will return when one
     // socket has some info on it
     highsock = buildSelectList(sock, socks, connectList, highsock);
     timeout.tv_sec  = 10;
@@ -127,7 +109,7 @@ int main(int argc, char* argv[])
 
 int initialize(int argc, char* argv[])
 {
-  /////////// SETUP PHASE //////////////	
+  /////////// SETUP PHASE //////////////
   // ASCII version of the server port
   char* asciiPort;
   // The port number after conversion from asciiPort
@@ -143,7 +125,7 @@ int initialize(int argc, char* argv[])
   struct addrinfo hints, *servinfo, *p;
 
   // make sure we got a port number as a parameter
-  if (argc < 2) 
+  if (argc < 2)
   {
     cout << "Usage: " << argv[0] << " PORT" << endl;
     return -1;
@@ -177,13 +159,13 @@ int initialize(int argc, char* argv[])
     // set the socket to non-blocking
     // use our own method:
     setNonBlocking(sock);
-	
+
     // get the port number: given by user
     asciiPort = argv[1];
     // convert to int:
     // from sockhelp.h
     port = atoi(asciiPort);
-      
+
     // bind our server to the address:
     if (bind(sock, p->ai_addr, p->ai_addrlen) == -1)
     {
@@ -208,7 +190,7 @@ int initialize(int argc, char* argv[])
 void setNonBlocking(int socket)
 {
   int opts;
-	
+
   opts = fcntl(socket, F_GETFL);
   if (opts < 0)
   {
@@ -230,10 +212,10 @@ int buildSelectList(int socket, fd_set& sockets, set<int>& connectionList, int h
 {
   // start from scratch
   FD_ZERO(&sockets);
-  
+
   // add our listening socket to the list
   FD_SET(socket, &sockets);
-  
+
   // add the alive sockets to the list
   for (set<int>::iterator i = connectionList.begin(); i!= connectionList.end(); ++i)
   {
@@ -253,7 +235,7 @@ void readSocks(int socket, fd_set& sockets, set<int>& connectionList)
   // ==> it will be part of the fd_set (ie, socks)
   if (FD_ISSET(socket, &sockets))
     handleNewConnection(socket, connectionList);
- 
+
   // see who else has something to say to us:
   for (set<int>::iterator i = connectionList.begin(); i != connectionList.end(); ++i)
   {
@@ -265,10 +247,10 @@ void readSocks(int socket, fd_set& sockets, set<int>& connectionList)
 //-------------------------------------------------------------------
 //
 void handleNewConnection(int socket, set<int>& connectionList)
-{	
+{
   // socket file descriptor for incoming connections
   int connection;
-	
+
   connection = accept(socket, NULL, NULL);
   if (connection < 0)
   {
@@ -295,7 +277,7 @@ void dealWithData(int _sock, set<int>& connectionList)
   // buffer for socket reads
   char buffer[1024];
   char *cur_char;
-	
+
   if (sock_gets(_sock, buffer, 1024) < 0)
   {
     // connection closed
@@ -322,7 +304,7 @@ int sock_gets(int sockFD, char* str, size_t count)
   int totalCount = 0;
   char *curPos;
   char lastRead = 0;
-	
+
   curPos = str;
   while(lastRead != 10)
   {
@@ -354,10 +336,10 @@ int sock_puts(int sockFD, char *str)
   size_t count = strlen(str);
   size_t bytesSent = 0;
   int thisWrite;
-	
+
   while (bytesSent < count)
   {
-    do 
+    do
       thisWrite = write(sockFD, str, count - bytesSent);
     while ((thisWrite < 0) && (errno == EINTR));
     if (thisWrite <= 0)
